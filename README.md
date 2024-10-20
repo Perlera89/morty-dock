@@ -42,8 +42,8 @@ Sigue los siguientes pasos para configurar y ejecutar el sistema ERP en tu entor
 ### Clonar el repositorio
 
 ```bash
-git clone https://github.com/usuario/erp-system.git
-cd erp-system
+git clone https://github.com/usuario/morty-dock.git
+cd morty-dock
 ```
 
 ### Instalar dependencias

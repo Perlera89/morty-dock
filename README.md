@@ -106,7 +106,3 @@ Las contribuciones a este proyecto son bienvenidas. Si deseas colaborar:
 ## Licencia
 
 Este proyecto está licenciado bajo la [MIT License](LICENSE).
-
----
-
-Este formato proporciona una descripción completa y funcional del proyecto, ayudando a cualquier persona que quiera colaborar o entender cómo funciona el ERP.

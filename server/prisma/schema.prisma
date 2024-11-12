@@ -1,0 +1,659 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//** Independent Tables
+model UserStatus {
+  id           Int           @id @default(autoincrement()) @map("id")
+  name         String        @unique @map("name") @db.VarChar(100)
+  description  String?       @map("description")
+  createdAt    DateTime      @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime      @map("updated_at") @db.Timestamp(6)
+  isDeleted    Boolean?      @map("is_deleted")
+  userAccounts UserAccount[]
+
+  @@map("user_status")
+}
+
+model RiskLevel {
+  id             Int            @id @default(autoincrement()) @map("id")
+  name           String         @unique @map("name") @db.VarChar(100)
+  description    String?        @map("description")
+  createdAt      DateTime       @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime       @map("updated_at") @db.Timestamp(6)
+  isDeleted      Boolean?       @map("is_deleted")
+  accessLogs     AccessLog[]
+  eventLogs      EventLog[]
+  userActivities UserActivity[]
+
+  @@map("risk_levels")
+}
+
+model Department {
+  id        Int        @id @default(autoincrement()) @map("id")
+  uuid      String     @unique @map("uuid") @db.VarChar(36)
+  name      String     @unique @map("name") @db.VarChar(100)
+  isDeleted Boolean?   @map("is_deleted")
+  districts District[]
+
+  @@map("department")
+}
+
+model Area {
+  id        Int         @id @default(autoincrement()) @map("id")
+  uuid      String      @unique @map("uuid") @db.VarChar(36)
+  name      String      @unique @map("name") @db.VarChar(100)
+  isDeleted Boolean?    @map("is_deleted")
+  inventory Inventory[]
+
+  @@map("area")
+}
+
+model Brand {
+  id        Int         @id @default(autoincrement()) @map("id")
+  uuid      String      @unique @map("uuid") @db.VarChar(36)
+  name      String      @unique @map("name") @db.VarChar(256)
+  isDeleted Boolean?    @map("is_deleted")
+  inventory Inventory[]
+
+  @@map("brand")
+}
+
+model Category {
+  id        Int         @id @default(autoincrement()) @map("id")
+  uuid      String      @unique @map("uuid") @db.VarChar(36)
+  name      String      @unique @map("name") @db.VarChar(100)
+  isDeleted Boolean?    @map("is_deleted")
+  inventory Inventory[]
+  tag       Tag[]
+
+  @@map("category")
+}
+
+model InvoiceStatus {
+  id              Int              @id @default(autoincrement()) @map("id")
+  uuid            String           @unique @map("uuid") @db.VarChar(36)
+  name            String           @unique @map("name") @db.VarChar(100)
+  isDeleted       Boolean?         @map("is_deleted")
+  purchaseDetails PurchaseDetail[]
+  sales           Sale[]
+
+  @@map("invoice_status")
+}
+
+model PaymentMethod {
+  id              Int              @id @default(autoincrement()) @map("id")
+  uuid            String           @unique @map("uuid") @db.VarChar(36)
+  term            DateTime         @map("term") @db.Timestamp(6)
+  name            String           @unique @map("name") @db.VarChar(100)
+  isDeleted       Boolean?         @map("is_deleted")
+  purchaseDetails PurchaseDetail[]
+  sales           Sale[]
+
+  @@map("payment_method")
+}
+
+model Position {
+  id          Int        @id @default(autoincrement()) @map("id")
+  uuid        String     @unique @map("uuid") @db.VarChar(36)
+  name        String     @unique @map("name") @db.VarChar(100)
+  description String?    @map("description")
+  isDeleted   Boolean?   @map("is_deleted")
+  employees   Employee[]
+
+  @@map("position")
+}
+
+model Genre {
+  id        Int        @id @default(autoincrement()) @map("id")
+  uuid      String     @unique @map("uuid") @db.VarChar(36)
+  name      String     @unique @map("name") @db.VarChar(100)
+  isDeleted Boolean?   @map("is_deleted")
+  employees Employee[]
+
+  @@map("genre")
+}
+
+model Store {
+  id        BigInt      @id @default(autoincrement()) @map("id")
+  uuid      String      @unique @map("uuid") @db.VarChar(36)
+  name      String      @unique @map("name") @db.VarChar(100)
+  location  String      @map("location") @db.VarChar(256)
+  ability   Decimal?    @map("ability") @db.Decimal
+  inventory Inventory[]
+
+  @@map("store")
+}
+
+model ProductType {
+  id          Int         @id @default(autoincrement()) @map("id")
+  uuid        String      @unique @map("uuid") @db.VarChar(36)
+  name        String      @unique @map("name") @db.VarChar(256)
+  isDeleted   Boolean?    @map("is_deleted")
+  inventories Inventory[]
+
+  @@map("product_type")
+}
+
+model AttendanceStatus {
+  id          Int      @id @default(autoincrement()) @map("id")
+  uuid        String   @unique @map("uuid") @db.VarChar(36)
+  name        String   @unique @map("name") @db.VarChar(256)
+  description String?  @map("description")
+  isDeleted   Boolean? @map("is_deleted")
+
+  @@map("attendance_status")
+}
+
+model ContractType {
+  id        Int        @id @default(autoincrement()) @map("id")
+  uuid      String     @unique @map("uuid") @db.VarChar(36)
+  name      String     @unique @map("name") @db.VarChar(256)
+  isDeleted Boolean?   @map("is_deleted")
+  contracts Contract[]
+
+  @@map("contract_type")
+}
+
+model TransactionType {
+  id           Int           @id @default(autoincrement()) @map("id")
+  uuid         String        @unique @map("uuid") @db.VarChar(36)
+  name         String        @unique @map("name") @db.VarChar(256)
+  isDeleted    Boolean?      @map("is_deleted")
+  transactions Transaction[]
+
+  @@map("transaction_type")
+}
+
+model Cash {
+  id          BigInt      @id @default(autoincrement()) @map("id")
+  uuid        String      @unique @map("uuid") @db.VarChar(36)
+  initBalance Decimal?    @map("init_balance") @db.Decimal
+  endBalance  Decimal?    @map("end_balance") @db.Decimal
+  income      Decimal?    @map("income") @db.Decimal
+  expensive   Decimal?    @map("expensive") @db.Decimal
+  date        DateTime?   @map("date") @db.Timestamp(6)
+  note        String?     @map("note")
+  createdAt   DateTime?   @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime?   @map("updated_at") @db.Timestamp(6)
+  isDeleted   Boolean?    @map("is_deleted")
+  salePoint   SalePoint[]
+
+  @@map("cash")
+}
+
+model Module {
+  id          Int         @id @default(autoincrement()) @map("id")
+  name        String      @unique @map("name") @db.VarChar(100)
+  description String?     @map("description")
+  createdAt   DateTime    @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime    @map("updated_at") @db.Timestamp(6)
+  isDeleted   Boolean?    @map("is_deleted")
+  operations  Operation[]
+
+  @@map("modules")
+}
+
+model Role {
+  id             Int             @id @default(autoincrement()) @map("id")
+  name           String          @unique @map("name") @db.VarChar(100)
+  description    String?         @map("description")
+  createdAt      DateTime        @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime        @map("updated_at") @db.Timestamp(6)
+  isDeleted      Boolean?        @map("is_deleted")
+  roleOperations RoleOperation[]
+  userAccounts   UserAccount[]
+
+  @@map("roles")
+}
+
+//** Dependent Tables
+
+model Operation {
+  id             Int             @id @default(autoincrement()) @map("id")
+  name           String          @unique @map("name") @db.VarChar(100)
+  description    String?         @map("description")
+  createdAt      DateTime        @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime        @map("updated_at") @db.Timestamp(6)
+  isDeleted      Boolean?        @map("is_deleted")
+  moduleId       Int?            @map("module_id")
+  module         Module?         @relation(fields: [moduleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  roleOperations RoleOperation[]
+
+  @@map("operations")
+}
+
+model RoleOperation {
+  id          Int        @id @default(autoincrement()) @map("id")
+  createdAt   DateTime   @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime   @map("updated_at") @db.Timestamp(6)
+  isDeleted   Boolean?   @map("is_deleted")
+  roleId      Int?       @map("rol_id")
+  operationId Int?       @map("operation_id")
+  operation   Operation? @relation(fields: [operationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role        Role?      @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("role_operations")
+}
+
+model UserAccount {
+  id             Int            @id @default(autoincrement()) @map("id")
+  userName       String         @unique @map("user_name") @db.VarChar(50)
+  email          String         @unique @map("email") @db.VarChar(256)
+  password       String         @map("password") @db.VarChar(512)
+  salt           String         @map("salt") @db.VarChar(512)
+  createdAt      DateTime       @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime       @map("updated_at") @db.Timestamp(6)
+  rolId          Int?           @map("rol_id")
+  userStatusId   Int?           @map("user_status_id")
+  accessLogs     AccessLog[]
+  eventLogs      EventLog[]
+  role           Role?          @relation(fields: [rolId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  userStatus     UserStatus?    @relation(fields: [userStatusId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  userActivities UserActivity[]
+
+  @@map("user_accounts")
+}
+
+model AccessLog {
+  id            BigInt       @id @default(autoincrement()) @map("id")
+  uuid          String       @unique @map("uuid") @db.VarChar(36)
+  detail        String       @map("detail")
+  createdAt     DateTime     @map("created_at") @db.Timestamp(6)
+  userAccountId Int?         @map("user_account_id")
+  riskLevelId   Int?         @map("risk_level_id")
+  riskLevels    RiskLevel?   @relation(fields: [riskLevelId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  userAccounts  UserAccount? @relation(fields: [userAccountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("access_log")
+}
+
+model EventLog {
+  id            BigInt       @id @default(autoincrement()) @map("id")
+  uuid          String       @unique @map("uuid") @db.VarChar(36)
+  detail        String       @map("detail")
+  createdAt     DateTime     @map("created_at") @db.Timestamp(6)
+  userAccountId Int?         @map("user_account_id")
+  riskLevelId   Int?         @map("risk_level_id")
+  riskLevels    RiskLevel?   @relation(fields: [riskLevelId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  userAccounts  UserAccount? @relation(fields: [userAccountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("event_log")
+}
+
+model UserActivity {
+  id            BigInt       @id @default(autoincrement()) @map("id")
+  uuid          String       @unique @map("uuid") @db.VarChar(36)
+  detail        String       @map("detail")
+  createdAt     DateTime     @map("created_at") @db.Timestamp(6)
+  userAccountId Int?         @map("user_account_id")
+  riskLevelId   Int?         @map("risk_level_id")
+  riskLevel     RiskLevel?   @relation(fields: [riskLevelId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  userAccount   UserAccount? @relation(fields: [userAccountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("user_activities")
+}
+
+model District {
+  id           Int         @id @default(autoincrement()) @map("id")
+  uuid         String      @unique @map("uuid") @db.VarChar(36)
+  name         String      @unique @map("name") @db.VarChar(100)
+  isDeleted    Boolean     @map("is_deleted")
+  departmentId Int?        @map("department_id")
+  cities       City[]
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("district")
+}
+
+model City {
+  id         Int       @id @default(autoincrement()) @map("id")
+  uuid       String    @unique @map("uuid") @db.VarChar(36)
+  name       String    @unique @map("name") @db.VarChar(100)
+  isDeleted  Boolean?  @map("is_deleted")
+  districtId Int?      @map("district_id")
+  address    Address[]
+  district   District? @relation(fields: [districtId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("city")
+}
+
+model Address {
+  id        Int        @id @default(autoincrement()) @map("id")
+  uuid      String     @unique @map("uuid") @db.VarChar(36)
+  location  String?    @map("location") @db.VarChar(255)
+  createdAt DateTime?  @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime?  @map("updated_at") @db.Timestamp(6)
+  isDeleted Boolean?   @map("is_deleted")
+  cityId    Int?       @map("city_id")
+  account   Account[]
+  city      City?      @relation(fields: [cityId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  client    Client[]
+  employee  Employee[]
+  profile   Profile[]
+  provider  Provider[]
+
+  @@map("address")
+}
+
+model Tag {
+  id         Int         @id @default(autoincrement()) @map("id")
+  uuid       String      @unique @map("uuid") @db.VarChar(36)
+  name       String      @unique @map("name") @db.VarChar(100)
+  isDeleted  Boolean?    @map("is_deleted")
+  categoryId Int?        @map("category_id")
+  category   Category?   @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tagDetail  TagDetail[]
+
+  @@map("tag")
+}
+
+model Inventory {
+  id            BigInt       @id @default(autoincrement()) @map("id")
+  uuid          String       @unique @map("uuid") @db.VarChar(36)
+  thumbnail     String?      @map("thumbnail") @db.VarChar(255)
+  minimumStock  Decimal?     @map("minimum_stock") @db.Decimal
+  safetyInfo    String?      @map("safety_info")
+  description   String?      @map("description")
+  createdAt     DateTime?    @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime?    @map("updated_at") @db.Timestamp(6)
+  isDeleted     Boolean?     @map("is_deleted")
+  categoryId    Int?         @map("category_id")
+  productTypeId Int?         @map("product_type_id")
+  areaId        Int?         @map("area_id")
+  brandId       Int?         @map("brand_id")
+  storeId       BigInt?      @map("store_id")
+  area          Area?        @relation(fields: [areaId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  brand         Brand?       @relation(fields: [brandId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  category      Category?    @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  productType   ProductType? @relation(fields: [productTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  store         Store?       @relation(fields: [storeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  products      Product[]
+
+  @@map("inventory")
+}
+
+model Employee {
+  id                   BigInt           @id @default(autoincrement()) @map("id")
+  uuid                 String           @unique @map("uuid") @db.VarChar(36)
+  firstName            String?          @map("first_name") @db.VarChar(100)
+  lastName             String?          @map("last_name") @db.VarChar(100)
+  identificationNumber String?          @map("identification_number") @db.VarChar(50)
+  phone                String?          @map("phone") @db.VarChar(50)
+  email                String?          @map("email") @db.VarChar(256)
+  salary               Decimal?         @map("salary") @db.Decimal
+  genreId              Int?             @map("genre_id")
+  addressId            Int?             @map("address_id")
+  positionId           Int?             @map("position_id")
+  address              Address?         @relation(fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  genre                Genre?           @relation(fields: [genreId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  position             Position?        @relation(fields: [positionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchaseDetails      PurchaseDetail[]
+  sales                Sale[]
+  salePoints           SalePoint[]
+  schedules            Schedule[]
+  transactions         Transaction[]
+
+  @@map("employee")
+}
+
+model Client {
+  id                   BigInt    @id @default(autoincrement()) @map("id")
+  uuid                 String    @unique @map("uuid") @db.VarChar(36)
+  firstName            String?   @map("first_name") @db.VarChar(100)
+  lastName             String?   @map("last_name") @db.VarChar(100)
+  identificationNumber String?   @map("identification_number") @db.VarChar(100)
+  phone                String?   @map("phone") @db.VarChar(50)
+  email                String?   @map("email") @db.VarChar(256)
+  relevantInfo         String?   @map("relevant_info")
+  createdAt            DateTime? @map("created_at") @db.Timestamp(6)
+  updatedAt            DateTime? @map("updated_at") @db.Timestamp(6)
+  isDeleted            Boolean?  @map("is_deleted")
+  addressId            Int?      @map("address_id")
+  address              Address?  @relation(fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sales                Sale[]
+
+  @@map("client")
+}
+
+model Profile {
+  id          BigInt    @id @default(autoincrement()) @map("id")
+  uuid        String    @unique @map("uuid") @db.VarChar(36)
+  name        String?   @map("name") @db.VarChar(100)
+  thumbnail   String?   @map("thumbnail") @db.VarChar(255)
+  phone       String?   @map("phone") @db.VarChar(50)
+  email       String?   @map("email") @db.VarChar(256)
+  nrc         String?   @map("nrc") @db.VarChar(255)
+  description String?   @map("description")
+  createdAt   DateTime? @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime? @map("updated_at") @db.Timestamp(6)
+  isDeleted   Boolean?  @map("is_deleted")
+  addressId   Int?      @map("address_id")
+  address     Address?  @relation(fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("profile")
+}
+
+model Provider {
+  id              BigInt           @id @default(autoincrement()) @map("id")
+  uuid            String           @unique @map("uuid") @db.VarChar(36)
+  name            String?          @map("name") @db.VarChar(100)
+  phone           String?          @map("phone") @db.VarChar(50)
+  email           String?          @map("email") @db.VarChar(256)
+  paymentTerms    String?          @map("payment_terms")
+  returnPolicies  String?          @map("return_policies")
+  warranties      String?          @map("warranties")
+  deliveryTerms   String?          @map("delivery_terms")
+  createdAt       DateTime?        @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime?        @map("updated_at") @db.Timestamp(6)
+  isDeleted       Boolean?         @map("is_deleted")
+  addressId       Int?             @map("address_id")
+  address         Address?         @relation(fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchases       Purchase[]
+  purchaseDetails PurchaseDetail[]
+
+  @@map("provider")
+}
+
+model Account {
+  id          BigInt        @id @default(autoincrement()) @map("id")
+  uuid        String        @unique @map("uuid") @db.VarChar(36)
+  name        String?       @map("name") @db.VarChar(255)
+  bank        String?       @map("bank") @db.VarChar(255)
+  balance     Decimal?      @map("balance") @db.Decimal
+  createdAt   DateTime?     @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime?     @map("updated_at") @db.Timestamp(6)
+  isDeleted   Boolean?      @map("is_deleted")
+  addressId   Int?          @map("address_id")
+  address     Address?      @relation(fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transaction Transaction[]
+
+  @@map("account")
+}
+
+model Product {
+  id            BigInt       @id @default(autoincrement()) @map("id")
+  uuid          String       @unique @map("uuid") @db.VarChar(36)
+  code          String?      @map("code") @db.VarChar(255)
+  stock         Int?         @map("stock")
+  purchasePrice Decimal?     @map("purchase_price") @db.Decimal
+  minimumPrice  Decimal?     @map("minimum_price") @db.Decimal
+  salePrice     Decimal?     @map("sale_price") @db.Decimal
+  iva           Decimal?     @map("iva") @db.Decimal
+  isOnSale      Boolean?     @map("is_on_sale")
+  isBlocked     Boolean?     @map("is_blocked")
+  createdAt     DateTime?    @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime?    @map("updated_at") @db.Timestamp(6)
+  isDeleted     Boolean?     @map("is_deleted")
+  inventoryId   BigInt?      @map("inventory_id")
+  inventory     Inventory?   @relation(fields: [inventoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  purchases     Purchase[]
+  saleDetails   SaleDetail[]
+  tagDetails    TagDetail[]
+
+  @@map("product")
+}
+
+model TagDetail {
+  id        Int       @id @default(autoincrement()) @map("id")
+  uuid      String    @unique @map("uuid") @db.VarChar(36)
+  createdAt DateTime? @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime? @map("updated_at") @db.Timestamp(6)
+  isDeleted Boolean?  @map("is_deleted")
+  tagId     Int?      @map("tag_id")
+  productId BigInt?   @map("product_id")
+  product   Product?  @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tag       Tag?      @relation(fields: [tagId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("tag_detail")
+}
+
+model Purchase {
+  id         BigInt    @id @default(autoincrement()) @map("id")
+  uuid       String    @unique @map("uuid") @db.VarChar(36)
+  amount     Decimal?  @map("amount") @db.Decimal
+  price      Decimal?  @map("price") @db.Decimal
+  productId  BigInt?   @map("product_id")
+  providerId BigInt?   @map("provider_id")
+  product    Product?  @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  provider   Provider? @relation(fields: [providerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("purchase")
+}
+
+model Sale {
+  id              BigInt         @id @default(autoincrement()) @map("id")
+  uuid            String         @unique @map("uuid") @db.VarChar(36)
+  isCancel        Boolean?       @map("is_cancel")
+  createdAt       DateTime?      @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime?      @map("updated_at") @db.Timestamp(6)
+  isDeleted       Boolean?       @map("is_deleted")
+  paymentMethodId Int?           @map("payment_method_id")
+  invoiceStatusId Int?           @map("invoice_status_id")
+  employeeId      BigInt?        @map("employee_id")
+  clientId        BigInt?        @map("client_id")
+  client          Client?        @relation(fields: [clientId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employee        Employee?      @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoiceStatus   InvoiceStatus? @relation(fields: [invoiceStatusId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  saleDetails     SaleDetail[]
+
+  @@map("sale")
+}
+
+model PurchaseDetail {
+  id              BigInt         @id @default(autoincrement()) @map("id")
+  uuid            String         @unique @map("uuid") @db.VarChar(36)
+  isCancel        Boolean?       @map("is_cancel")
+  createdAt       DateTime?      @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime?      @map("updated_at") @db.Timestamp(6)
+  isDeleted       Boolean?       @map("is_deleted")
+  paymentMethodId Int?           @map("payment_method_id")
+  invoiceStatusId Int?           @map("invoice_status_id")
+  employeeId      BigInt?        @map("employee_id")
+  providerId      BigInt?        @map("provider_id")
+  employee        Employee?      @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoiceStatus   InvoiceStatus? @relation(fields: [invoiceStatusId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  paymentMethod   PaymentMethod? @relation(fields: [paymentMethodId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  provider        Provider?      @relation(fields: [providerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("purchase_details")
+}
+
+model SaleDetail {
+  id        BigInt   @id @default(autoincrement()) @map("id")
+  uuid      String   @unique @map("uuid") @db.VarChar(36)
+  amount    Int?     @map("amount")
+  price     Decimal? @map("price") @db.Decimal
+  discount  Decimal? @map("discount") @db.Decimal
+  isDeleted Boolean? @map("is_deleted")
+  saleId    BigInt?  @map("sale_id")
+  productId BigInt?  @map("product_id")
+  product   Product? @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sale      Sale?    @relation(fields: [saleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("sale_details")
+}
+
+model SalePoint {
+  id         Int       @id @default(autoincrement()) @map("id")
+  uuid       String    @unique @map("uuid") @db.VarChar(36)
+  name       String?   @map("name") @db.VarChar(255)
+  code       String?   @map("code") @db.VarChar(255)
+  state      String?   @map("state") @db.VarChar(255)
+  balance    Decimal?  @map("balance") @db.Decimal
+  isDeleted  Boolean?  @map("is_deleted")
+  employeeId BigInt?   @map("employee_id")
+  cashId     BigInt?   @map("cash_id")
+  cash       Cash?     @relation(fields: [cashId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employee   Employee? @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("sale_point")
+}
+
+model Schedule {
+  id         Int          @id @default(autoincrement()) @map("id")
+  uuid       String       @unique @map("uuid") @db.VarChar(36)
+  entryTime  DateTime?    @map("entry_time") @db.Time(6)
+  exitTime   DateTime?    @map("exit_time") @db.Time(6)
+  duration   DateTime?    @map("duration") @db.Time(6)
+  createdAt  DateTime?    @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime?    @map("updated_at") @db.Timestamp(6)
+  isDeleted  Boolean?     @map("is_deleted")
+  employeeId BigInt?      @map("employee_id")
+  attendance Attendance[]
+  employee   Employee?    @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("schedule")
+}
+
+model Attendance {
+  id         BigInt    @id @default(autoincrement()) @map("id")
+  uuid       String    @unique @map("uuid") @db.VarChar(36)
+  date       DateTime? @map("date") @db.Date
+  timestamp  DateTime? @map("timestamp") @db.Timestamp(6)
+  createdAt  DateTime? @map("created_at") @db.Timestamp(6)
+  updatedAt  DateTime? @map("updated_at") @db.Timestamp(6)
+  isDeleted  Boolean?  @map("is_deleted")
+  scheduleId Int?      @map("schedule_id")
+  schedule   Schedule? @relation(fields: [scheduleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("attendance")
+}
+
+model Contract {
+  id             BigInt        @id @default(autoincrement()) @map("id")
+  uuid           String        @unique @map("uuid") @db.VarChar(36)
+  startDate      DateTime?     @map("start_date") @db.Timestamp(6)
+  endDate        DateTime?     @map("end_date") @db.Timestamp(6)
+  salary         Decimal?      @map("salary") @db.Decimal
+  signedOn       DateTime?     @map("signed_on") @db.Timestamp(6)
+  createdAt      DateTime?     @map("created_at") @db.Timestamp(6)
+  updatedAt      DateTime?     @map("updated_at") @db.Timestamp(6)
+  isDeleted      Boolean?      @map("is_deleted")
+  contractTypeId Int?          @map("contract_type_id")
+  contractType   ContractType? @relation(fields: [contractTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("contract")
+}
+
+model Transaction {
+  id                BigInt           @id @default(autoincrement()) @map("id")
+  uuid              String           @unique @map("uuid") @db.VarChar(36)
+  amount            Decimal?         @map("amount") @db.Decimal
+  issueDate         DateTime?        @map("issue_date") @db.Date
+  reference         String?          @map("reference") @db.VarChar(255)
+  employeeId        BigInt?          @map("employee_id")
+  transactionTypeId Int?             @map("transaction_type_id")
+  accountId         BigInt?          @map("account_id")
+  account           Account?         @relation(fields: [accountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  employee          Employee?        @relation(fields: [employeeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  transactionType   TransactionType? @relation(fields: [transactionTypeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("transaction")
+}

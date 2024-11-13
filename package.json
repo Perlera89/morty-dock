@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
   "name": "morty-dock",
   "private": true,
   "sideEffects": false,
@@ -42,5 +43,10 @@
   },
   "engines": {
     "node": ">=20.0.0"
+=======
+  "dependencies": {},
+  "devDependencies": {
+    "lucide-react": "^0.456.0"
+>>>>>>> Stashed changes
   }
 }

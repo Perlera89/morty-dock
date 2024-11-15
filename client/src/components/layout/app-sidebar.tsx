@@ -37,13 +37,13 @@ const data = {
   navMain: [
     {
       title: "Inventory",
-      url: "/inventory",
+      url: "#",
       icon: Package2,
       isActive: true,
       items: [
         {
           title: "History",
-          url: "#",
+          url: "/pages/inventory",
         },
         {
           title: "Starred",
